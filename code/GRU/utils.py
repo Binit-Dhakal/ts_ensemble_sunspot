@@ -15,31 +15,71 @@ def to_windowed(data,window_size,pred_size):
 
     return np.array(out)#, np.array(targets)
 
+# def train_test_val_split(x_vals,x_marks=None,train_proportion = 0.6, val_proportion = 0.2, test_proportion = 0.2\
+#               , window_size = 12, pred_size = 1):
+
+#     scaler = StandardScaler()
+#     x_vals = scaler.fit_transform(x_vals.reshape(-1, 1)).reshape(-1)
+
+#     x_vals_windowed = to_windowed(x_vals,window_size,pred_size)
+
+#     total_len = len(x_vals_windowed)
+#     train_len = int(total_len*train_proportion)
+#     val_len = int(total_len*val_proportion)
+#     test_len = int(total_len*test_proportion)
+#     ### Add a scaler here on x_vals
+
+#     train_data = x_vals_windowed[0:train_len]
+#     val_data = x_vals_windowed[train_len:(train_len+val_len)]
+#     test_data = x_vals_windowed[(train_len+val_len):]
+
+#     # train = to_windowed(train_data,window_size,pred_size)
+#     # val = to_windowed(val_data,window_size,pred_size)
+#     # test = to_windowed(test_data,window_size,pred_size)
+
+#     train = torch.from_numpy(train_data).float()
+#     val = torch.from_numpy(val_data).float()
+#     test = torch.from_numpy(test_data).float()
+#     if x_marks is not None:
+#         train_marks = x_marks[0:train_len]
+#         val_marks = x_marks[train_len:(train_len+val_len)]
+#         test_marks = x_marks[(train_len+val_len):]
+
+#         train_marks_window = to_windowed(train_marks,window_size,pred_size)
+#         val_marks_window = to_windowed(val_marks,window_size,pred_size)
+#         test_marks_window = to_windowed(test_marks,window_size,pred_size)
+
+#         train_marks_window = torch.from_numpy(train_marks_window).float()
+#         val_marks_window = torch.from_numpy(val_marks_window).float()
+#         test_marks_window = torch.from_numpy(test_marks_window).float()
+
+#         return train,val,test,train_marks_window,val_marks_window,test_marks_window,\
+#             train_data,val_data,test_data, scaler
+#     else: 
+#         return train,val,test,train_data,val_data,test_data, scaler
+
 def train_test_val_split(x_vals,x_marks=None,train_proportion = 0.6, val_proportion = 0.2, test_proportion = 0.2\
               , window_size = 12, pred_size = 1):
 
-    scaler = StandardScaler()
-    x_vals = scaler.fit_transform(x_vals.reshape(-1, 1)).reshape(-1)
-
-    x_vals_windowed = to_windowed(x_vals,window_size,pred_size)
-
-    total_len = len(x_vals_windowed)
+    total_len = len(x_vals)
     train_len = int(total_len*train_proportion)
     val_len = int(total_len*val_proportion)
     test_len = int(total_len*test_proportion)
     ### Add a scaler here on x_vals
+    scaler = StandardScaler()
+    x_vals = scaler.fit_transform(x_vals.reshape(-1, 1)).reshape(-1)
 
-    train_data = x_vals_windowed[0:train_len]
-    val_data = x_vals_windowed[train_len:(train_len+val_len)]
-    test_data = x_vals_windowed[(train_len+val_len):]
+    train_data = x_vals[0:train_len]
+    val_data = x_vals[train_len:(train_len+val_len)]
+    test_data = x_vals[(train_len+val_len):]
 
-    # train = to_windowed(train_data,window_size,pred_size)
-    # val = to_windowed(val_data,window_size,pred_size)
-    # test = to_windowed(test_data,window_size,pred_size)
+    train = to_windowed(train_data,window_size,pred_size)
+    val = to_windowed(val_data,window_size,pred_size)
+    test = to_windowed(test_data,window_size,pred_size)
 
-    train = torch.from_numpy(train_data).float()
-    val = torch.from_numpy(val_data).float()
-    test = torch.from_numpy(test_data).float()
+    train = torch.from_numpy(train).float()
+    val = torch.from_numpy(val).float()
+    test = torch.from_numpy(test).float()
     if x_marks is not None:
         train_marks = x_marks[0:train_len]
         val_marks = x_marks[train_len:(train_len+val_len)]

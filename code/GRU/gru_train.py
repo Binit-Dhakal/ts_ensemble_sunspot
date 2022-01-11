@@ -112,6 +112,8 @@ if __name__ == "__main__":
         'window_size': tune.grid_search([192]),
         'lr': tune.grid_search([1e-3,5e-4,1e-4,5e-5,1e-5]),
         'batch_size': tune.grid_search([8,16,32,64,128]),
+        'optim_step': tune.choice([2,5,10,15,20]), 
+        'lr_decay': tune.choice([0.95,0.9,0.85,0.8,0.75,0.7]),
     }
     #reporter = CLIReporter(max_progress_rows=10)
     reporter.add_metric_column("val_loss")

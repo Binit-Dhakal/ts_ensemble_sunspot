@@ -54,8 +54,8 @@ def train(config, checkpoint_dir):
     test_proportion = 0.2
     val_proportion = 0.2
 
-    batch_size = 128#config['batch_size']
-    lr = 1e-4#config['lr']
+    batch_size = config['batch_size']
+    lr = config['lr']
     window_size = config['window_size']
 
     feature_size = config['feature_size']
@@ -120,14 +120,16 @@ def train(config, checkpoint_dir):
 if __name__ == "__main__":
     config = {
         'feature_size':tune.choice([216,512,1024]),
-        'num_enc_layers':tune.choice([1,2,3,4,5]),
-        'num_dec_layers':tune.choice([1,2,3,4,5]),
+        'num_enc_layers':tune.choice([2,3,4,5]),
+        'num_dec_layers':tune.choice([2,3,4,5]),
         'num_head':tune.choice([2,4,8]),
         'd_ff':tune.choice([216,512,1024]),
         'dropout':tune.choice([0.1,0.2]),
-        #'lr':tune.choice([0.001,0.0001]),
+        'lr':tune.grid_search([1e-3,5e-4,1e-4,5e-5,1e-5]),
         'window_size':tune.choice([192]),
-        #'batch_size':tune.grid_search([16])
+        'batch_size':tune.grid_search([16,32,64,128,256]),
+        'optim_step': tune.choice([2,5,10,15,20]), 
+        'lr_decay': tune.choice([0.95,0.9,0.85,0.8,0.75,0.7]),
 }
     ray.init(ignore_reinit_error=False, include_dashboard=True, dashboard_host= '0.0.0.0')
     sched = ASHAScheduler(
@@ -135,7 +137,7 @@ if __name__ == "__main__":
             grace_period=10,
             reduction_factor=2)
     analysis = tune.run(tune.with_parameters(train), config=config, num_samples=1000, metric='val_loss', mode='min',\
-         scheduler=sched, resources_per_trial={"cpu": 12,"gpu": 1/2},max_concurrent_trials=4, queue_trials = True, max_failures=1000, local_dir="/scratch/yd1008/ray_results",)
+         scheduler=sched, resources_per_trial={"cpu": 12,"gpu": 1/2},max_concurrent_trials=4, max_failures=1000, local_dir="/scratch/yd1008/ray_results",)
 
     best_trail = analysis.get_best_config(mode='min')
     print('The best configs are: ',best_trail)
