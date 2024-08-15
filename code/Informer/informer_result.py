@@ -11,6 +11,7 @@ import argparse
 from informer import Informer
 from utils import *
 import torch.nn as nn
+import os
 
 
 def process_one_batch(batch_x, batch_y):
@@ -175,7 +176,16 @@ if __name__ == "__main__":
     random.seed(1008)
     torch.manual_seed(1008)
 
-    root_dir = ""  # specify where results will be saved
+    root_dir = "/kaggle/working/datas"  # specify where results will be saved
+
+    if not os.path.exists(root_dir):
+        os.makedirs(root_dir)
+
+    fig_dir = "/kaggle/working/datas/figs"
+
+    if not os.path.exists(fig_dir):
+        os.makedirs(fig_dir)
+
     sns.set_style("whitegrid")
     sns.set_palette(["#57068c", "#E31212", "#01AD86"])
     print("pytorch version: ", torch.__version__)
@@ -393,6 +403,5 @@ if __name__ == "__main__":
     plt.close(fig)
 
     test_result_df = pd.DataFrame(test_result)
+    test_result_df["truth"] = truth
     test_result_df.to_csv(root_dir + "/informer_prediction.csv")
-    truth_df = pd.DataFrame(truth)
-    truth_df.to_csv(root_dir + "/sunspot_truth.csv")
