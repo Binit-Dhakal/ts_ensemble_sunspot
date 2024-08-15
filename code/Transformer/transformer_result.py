@@ -348,22 +348,8 @@ if __name__ == "__main__":
     truth = scaler.inverse_transform(truth)
     RMSE = mean_squared_error(truth, test_result) ** 0.5
     MAE = mean_absolute_error(truth, test_result)
-    RMSE_first_window = (
-        mean_squared_error(truth[: window_size + 1], test_result[: window_size + 1])
-        ** 0.5
-    )
-    MAE_first_window = mean_absolute_error(
-        truth[: window_size + 1], test_result[: window_size + 1]
-    )
-    RMSE_after_first_window = (
-        mean_squared_error(truth[window_size:], test_result[window_size:]) ** 0.5
-    )
-    MAE_after_first_window = mean_absolute_error(
-        truth[window_size:], test_result[window_size:]
-    )
-    print(
-        f"RMSE: {RMSE}, MAE: {MAE} \n RMSE_first_window: {RMSE_first_window}, MAE_first_window: {MAE_first_window} \n RMSE_after_first_window: {RMSE_after_first_window}, MAE_after_first_window: {MAE_after_first_window}"
-    )
+
+    print(f"RMSE: {RMSE}, MAE: {MAE}")
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(20, 10))
     ax.plot(test_result, label="forecast")
