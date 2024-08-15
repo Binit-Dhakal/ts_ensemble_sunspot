@@ -29,12 +29,13 @@ def train_test_val_split(
     x_vals = scaler.fit_transform(x_vals.reshape(-1, 1)).reshape(-1)
     x_vals = to_windowed(x_vals, window_size, pred_size)
     total_len = len(x_vals)
-    if use_nasa_test_range == True or use_nasa_test_range == "nasa_test":
-        test_len = 274  ### 274 specified to train second round with data range conform to NASA's
+    if use_nasa_test_range is True or use_nasa_test_range == "nasa_test":
+        test_len = 132  ### 274 specified to train second round with data range conform to NASA's
         val_proportion = val_proportion / (val_proportion + train_proportion)
         val_len = int((total_len - test_len) * val_proportion)
+        val_len = 264
         train_len = total_len - val_len - test_len
-    elif use_nasa_test_range == False:
+    elif use_nasa_test_range is False:
         train_len = int(total_len * train_proportion)
         val_len = total_len - train_len
     else:

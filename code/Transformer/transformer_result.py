@@ -157,7 +157,7 @@ if __name__ == "__main__":
     random.seed(1008)
     torch.manual_seed(1008)
 
-    root_dir = "/kaggle/working/datas"  # specify where results will be saved
+    root_dir = "/kaggle/working/datas/"  # specify where results will be saved
 
     if not os.path.exists(root_dir):
         os.makedirs(root_dir)
@@ -242,11 +242,11 @@ if __name__ == "__main__":
         scheduler = optim.lr_scheduler.StepLR(optimizer, optim_step, gamma=lr_decay)
         # writer = tensorboard.SummaryWriter('') #specify where tensorboard results will be saved
 
-        epochs = 200
+        epochs = 100
         train_losses = []
         test_losses = []
         best_test_loss = float("inf")
-        Early_Stopping = early_stopping(patience=20)
+        Early_Stopping = early_stopping(patience=12)
         for epoch in range(1, epochs + 1):
             model.train()
             total_loss = 0.0
@@ -289,6 +289,7 @@ if __name__ == "__main__":
         ax.plot(xs, test_losses)
         fig.savefig(root_dir + "figs/transformer_test_loss.png")
         plt.close(fig)
+
     ### Predict
     if not requires_training:
         model = torch.load(pre_trained_file_name)
@@ -330,69 +331,6 @@ if __name__ == "__main__":
                 (test_result, output[:, -1, :].view(-1).detach().cpu()), 0
             )
             truth = torch.cat((truth, targets[:, -1, :].view(-1).detach().cpu()), 0)
-
-    val_rollout = torch.Tensor(0)
-    val_result = torch.Tensor(0)
-    val_truth = torch.Tensor(0)
-
-    with torch.no_grad():
-        for i, (data, targets) in enumerate(val_loader):
-            if i == 0:
-                enc_in = data
-                dec_in = targets
-                val_rollout = targets
-            else:
-                enc_in = val_rollout[:, -window_size:, :]
-                dec_in = torch.zeros([enc_in.shape[0], 1, enc_in.shape[-1]]).float()
-                dec_in = torch.cat(
-                    [enc_in[:, : (window_size - 1), :], dec_in], dim=1
-                ).float()
-
-            data, targets = data.to(device), targets.to(device)
-            output, _ = process_one_batch(data, targets)
-            # enc_in, dec_in, targets = enc_in.to(device), dec_in.to(device), targets.to(device)
-            # output = model(enc_in, dec_in)
-
-            val_rollout = torch.cat(
-                [val_rollout, output[:, -1:, :].detach().cpu()], dim=1
-            )
-            val_result = torch.cat(
-                (val_result, output[:, -1, :].view(-1).detach().cpu()), 0
-            )
-            val_truth = torch.cat(
-                (val_truth, targets[:, -1, :].view(-1).detach().cpu()), 0
-            )
-
-    train_rollout = torch.Tensor(0)
-    train_result = torch.Tensor(0)
-    train_truth = torch.Tensor(0)
-
-    with torch.no_grad():
-        for i, (data, targets) in enumerate(train_loader):
-            if i == 0:
-                enc_in = data
-                dec_in = targets
-                train_rollout = targets
-            else:
-                enc_in = train_rollout[:, -window_size:, :]
-                dec_in = torch.zeros([enc_in.shape[0], 1, enc_in.shape[-1]]).float()
-                dec_in = torch.cat(
-                    [enc_in[:, : (window_size - 1), :], dec_in], dim=1
-                ).float()
-            data, targets = data.to(device), targets.to(device)
-            output, _ = process_one_batch(data, targets)
-            # enc_in, dec_in, targets = enc_in.to(device), dec_in.to(device), targets.to(device)
-            # output = model(enc_in, dec_in)
-
-            train_rollout = torch.cat(
-                [train_rollout, output[:, -1:, :].detach().cpu()], dim=1
-            )
-            train_result = torch.cat(
-                (train_result, output[:, -1, :].view(-1).detach().cpu()), 0
-            )
-            train_truth = torch.cat(
-                (train_truth, targets[:, -1, :].view(-1).detach().cpu()), 0
-            )
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(20, 10))
     ax.plot(test_result, label="forecast")
@@ -436,32 +374,6 @@ if __name__ == "__main__":
     ax.legend(loc="upper right")
     fig.savefig(root_dir + "figs/transformer_inverse_prediction.png")
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(20, 10))
-    ax.plot(val_result, label="forecast")
-    ax.plot(val_truth, label="truth")
-    ax.plot(val_result - val_truth, ls="--", label="residual")
-    ax.axhline(y=0)
-    ax.legend(loc="upper right")
-    fig.savefig(root_dir + "figs/transformer_val_inverse_prediction.png")
-
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(20, 10))
-    ax.plot(train_result, label="forecast")
-    ax.plot(train_truth, label="truth")
-    ax.plot(train_result - train_truth, ls="--", label="residual")
-    ax.axhline(y=0)
-    ax.legend(loc="upper right")
-    fig.savefig(root_dir + "figs/transformer_train_inverse_prediction.png")
-
-    ### Save model result
-    val_result = val_result.numpy().reshape(-1, 1)
-    val_result = scaler.inverse_transform(val_result)
-    val_result_df = pd.DataFrame(val_result)
-    val_result_df.to_csv(root_dir + "/transformer_val_prediction.csv")
-
-    train_result = train_result.numpy().reshape(-1, 1)
-    train_result = scaler.inverse_transform(train_result)
-    train_result_df = pd.DataFrame(train_result)
-    train_result_df.to_csv(root_dir + "/transformer_train_prediction.csv")
-
     test_result_df = pd.DataFrame(test_result, columns=["predictions"])
+    test_result_df["truth"] = truth
     test_result_df.to_csv(root_dir + "transformer_prediction.csv")
