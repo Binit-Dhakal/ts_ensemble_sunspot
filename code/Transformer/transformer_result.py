@@ -181,8 +181,8 @@ if __name__ == "__main__":
         "d_ff": 1024,
         "dropout": 0.1,
         "lr": 0.0005,
-        "window_size": 60,
-        "batch_size": 32,
+        "window_size": 192,
+        "batch_size": 256,
         "optim_step": 2,
         "lr_decay": 0.95,
     }
