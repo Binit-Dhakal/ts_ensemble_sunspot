@@ -283,12 +283,12 @@ if __name__ == "__main__":
         optimizer = optim.AdamW(model.parameters(), lr=lr)
         scheduler = optim.lr_scheduler.StepLR(optimizer, optim_step, gamma=lr_decay)
 
-        epochs = 200
+        epochs = 150
         train_losses = []
         test_losses = []
         tolerance = 10
         best_test_loss = float("inf")
-        Early_Stopping = early_stopping(patience=20)
+        Early_Stopping = early_stopping(patience=12)
         for epoch in range(1, epochs + 1):
             model.train()
             total_loss = 0.0
@@ -382,9 +382,9 @@ if __name__ == "__main__":
             truth = torch.cat((truth, targets[:, -1, :].view(-1).detach().cpu()), 0)
 
     ### Check MSE, MAE
-    test_result = test_result.numpy().rescale(-1, 1)
+    test_result = test_result.numpy().reshape(-1, 1)
     test_result = scaler.inverse_transform(test_result)
-    truth = truth.numpy().rescale(-1, 1)
+    truth = truth.numpy().reshape(-1, 1)
     truth = scaler.inverse_transform(truth)
 
     RMSE = mean_squared_error(truth, test_result) ** 0.5
