@@ -57,7 +57,7 @@ if __name__ == "__main__":
     test_proportion = 0
     val_proportion = 0.3
 
-    window_size = 192
+    window_size = 64  # 192
     batch_size = 128
     train_val_loader, train_loader, val_loader, test_loader, scaler = get_data_loaders(
         train_proportion,
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     plt.close(fig)
 
     ### Check MSE, MAE
-    future_result = future_result.numpy()
+    future_result = future_result.numpy().reshape(-1, 1)
     future_result = scaler.inverse_transform(future_result)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(20, 10))

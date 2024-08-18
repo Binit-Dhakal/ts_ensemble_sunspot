@@ -193,16 +193,16 @@ if __name__ == "__main__":
     # best_config = {'d_model': 216, 'n_heads': 2, 'e_layers': 3, 'd_layers': 3, 'd_ff': 1024, 'window_size': 192, 'dropout': 0.2, 'lr': 0.0001, 'optim_step': 5, 'lr_decay': 0.9, 'factor': 9, 'batch_size': 128}
     # future
     best_config = {
-        "d_model": 512,
-        "n_heads": 4,
-        "e_layers": 2,
-        "d_layers": 4,
+        "d_model": 216,
+        "n_heads": 2,
+        "e_layers": 3,
+        "d_layers": 3,
         "d_ff": 512,
-        "window_size": 192,
+        "window_size": 64,
         "dropout": 0.2,
         "lr": 0.0001,
-        "optim_step": 10,
-        "lr_decay": 0.75,
+        "optim_step": 5,
+        "lr_decay": 0.9,
         "factor": 9,
         "batch_size": 128,
     }
